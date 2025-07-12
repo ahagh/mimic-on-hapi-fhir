@@ -1,0 +1,28 @@
+FROM python:3.11-slim
+
+# Set working directory
+WORKDIR /app
+
+# Install required packages
+RUN apt-get update && apt-get install -y \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy the server script
+COPY fhir_file_server.py /app/fhir_file_server.py
+
+# Make the script executable
+RUN chmod +x /app/fhir_file_server.py
+
+# Create directory for FHIR files (will be mounted)
+RUN mkdir -p /app/fhir
+
+# Expose port 8000
+EXPOSE 8000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost:8000/ || exit 1
+
+# Run the server
+CMD ["python", "/app/fhir_file_server.py", "--verbose"]

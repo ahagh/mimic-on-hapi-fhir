@@ -1,0 +1,142 @@
+services:
+  fhir:
+    image: hapiproject/hapi:latest
+    ports:
+      - 8080:8080
+    restart: "unless-stopped"
+    depends_on:
+      - postgres-db
+      - fhir-files
+    environment:
+      # Bulk data configuration
+      - hapi.fhir.bulkdata.enabled=true
+      - hapi.fhir.bulk_export_enabled=true
+      - hapi.fhir.bulk_import_enabled=true
+      - hapi.fhir.cors.enabled=true
+      - hapi.fhir.cors.allow_origin=*
+      
+      # Disable integrity checks for faster imports
+      - hapi.fhir.enforce_referential_integrity_on_write=false
+      - hapi.fhir.enforce_referential_integrity_on_delete=false
+      
+      # Database configuration
+      - "spring.datasource.url=jdbc:postgresql://postgres-db:5432/postgres"
+      - "spring.datasource.username=postgres"
+      - "spring.datasource.password=postgres"
+      - "spring.datasource.driverClassName=org.postgresql.Driver"
+      - "spring.jpa.properties.hibernate.dialect=ca.uhn.fhir.jpa.model.dialect.HapiFhirPostgres94Dialect"
+      - "spring.jpa.hibernate.ddl-auto=update"
+      - "hapi.fhir.fhir_version=R4"
+      
+      # Performance optimizations for bulk import
+      - "spring.jpa.properties.hibernate.jdbc.batch_size=100"
+      - "spring.jpa.properties.hibernate.order_inserts=true"
+      - "spring.jpa.properties.hibernate.order_updates=true"
+      - "spring.jpa.properties.hibernate.jdbc.batch_versioned_data=true"
+      - "spring.jpa.properties.hibernate.connection.autocommit=false"
+      - "spring.jpa.properties.hibernate.generate_statistics=false"
+      - "spring.jpa.show-sql=false"
+      
+      # Disable unnecessary features for testing
+      - hapi.fhir.subscription.enabled=false
+      - hapi.fhir.narrative_enabled=false
+      - hapi.fhir.validation_enabled=false
+      - hapi.fhir.graphql_enabled=false
+      - hapi.fhir.mdm_enabled=false
+      - hapi.fhir.cr_enabled=false
+      - hapi.fhir.packages_enabled=false
+      
+      # Memory and connection pool settings
+      - "spring.datasource.hikari.maximum-pool-size=50"
+      - "spring.datasource.hikari.minimum-idle=10"
+      - "spring.datasource.hikari.connection-timeout=30000"
+      - "spring.datasource.hikari.idle-timeout=300000"
+      - "spring.datasource.hikari.max-lifetime=1800000"
+      
+      # JVM memory settings for better performance
+      - "JAVA_OPTS=-Xmx4g -Xms2g -XX:+UseG1GC -XX:MaxGCPauseMillis=200"
+    volumes:
+      - ./fhir:/app/fhir
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/fhir/metadata"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  fhir-files:
+    build:
+      context: .
+      dockerfile: Dockerfile.fhir-files
+    ports:
+      - 8000:8000
+    restart: "unless-stopped"
+    volumes:
+      - ./fhir:/app/fhir:ro
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  cloudflare-tunnel:
+    image: cloudflare/cloudflared:latest
+    restart: "unless-stopped"
+    depends_on:
+      - fhir
+    command: tunnel --url http://fhir:8080 --no-autoupdate
+    ports:
+      - "8080"  # This allows cloudflared to connect to the fhir service
+
+  postgres-db:
+    image: postgis/postgis:16-3.4
+    restart: "unless-stopped"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+      - POSTGRES_INITDB_ARGS=--encoding=UTF-8 --lc-collate=C --lc-ctype=C
+    ports:
+      - 5432:5432
+    volumes:
+      - postgres-db:/var/lib/postgresql/data
+      - ./postgres-init.sql:/docker-entrypoint-initdb.d/postgres-init.sql
+    command: >
+      postgres
+      -c max_connections=200
+      -c shared_buffers=1GB
+      -c effective_cache_size=3GB
+      -c maintenance_work_mem=256MB
+      -c checkpoint_completion_target=0.9
+      -c wal_buffers=16MB
+      -c default_statistics_target=100
+      -c random_page_cost=1.1
+      -c effective_io_concurrency=200
+      -c work_mem=32MB
+      -c min_wal_size=1GB
+      -c max_wal_size=4GB
+      -c max_worker_processes=8
+      -c max_parallel_workers_per_gather=4
+      -c max_parallel_workers=8
+      -c max_parallel_maintenance_workers=4
+      -c synchronous_commit=off
+      -c wal_compression=on
+      -c log_checkpoints=off
+      -c log_connections=off
+      -c log_disconnections=off
+      -c log_lock_waits=off
+      -c log_temp_files=-1
+      -c log_autovacuum_min_duration=-1
+      -c autovacuum=off
+      -c fsync=off
+      -c full_page_writes=off
+      -c wal_level=minimal
+      -c archive_mode=off
+      -c max_wal_senders=0
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres-db: ~
