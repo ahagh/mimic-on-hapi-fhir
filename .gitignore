@@ -272,5 +272,6 @@ jspm_packages/
 .dynamodb/
 
 fhir/**
-filtered_fhir/**
 fhir_notes/**
+filtered_fhir/**
+filtered_fhir_notes/**
