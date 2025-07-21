@@ -272,3 +272,4 @@ jspm_packages/
 .dynamodb/
 
 fhir/**
+filtered_fhir/**
