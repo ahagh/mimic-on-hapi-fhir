@@ -273,3 +273,4 @@ jspm_packages/
 
 fhir/**
 filtered_fhir/**
+fhir_notes/**
