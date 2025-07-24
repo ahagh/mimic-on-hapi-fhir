@@ -39,7 +39,7 @@ class FHIRBulkImporter:
         try:
             # Try to get a simple directory listing (this might not work with our custom server)
             # Instead, we'll use the known file patterns
-            fhir_dir = "./filtered_fhir"
+            fhir_dir = "./fhir"
             if os.path.exists(fhir_dir):
                 files = [
                     f
