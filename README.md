@@ -4,7 +4,7 @@
 
 ## 🎯 Overview
 
-This repository provides a complete, production-ready toolkit for deploying the **MIMIC-IV dataset** as a FHIR R4 server using HAPI FHIR, PostgreSQL, and Docker Compose. Perfect for healthcare data scientists, ML engineers, and researchers who need rapid access to structured clinical data through standardized FHIR APIs.
+This repository provides a complete toolkit for deploying the **MIMIC-IV dataset** as a FHIR R4 server using HAPI FHIR, PostgreSQL, and Docker Compose. Perfect for healthcare data scientists, ML engineers, and researchers who need rapid access to structured clinical data through standardized FHIR APIs.
 
 ### Key Features
 
