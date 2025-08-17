@@ -195,16 +195,6 @@ def main():
     print(f"Access files via: http://fhir-files:{args.port}/filename.ndjson.gz")
     print("\nExample bulk import URLs:")
 
-    # Show example URLs for some files
-    sample_files = [
-        "MimicPatient.ndjson.gz",
-        "MimicCondition.ndjson.gz",
-        "MimicEncounter.ndjson.gz",
-    ]
-    for filename in sample_files:
-        if os.path.exists(f"/app/fhir/{filename}"):
-            print(f"  http://fhir-files:{args.port}/{filename}")
-
     print("\nPress Ctrl+C to stop the server")
     print("-" * 60)
 
