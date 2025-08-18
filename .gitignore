@@ -271,8 +271,4 @@ jspm_packages/
 # DynamoDB Local files
 .dynamodb/
 
-fhir/**
-fhir_notes/**
-filtered_fhir/**
-filtered_fhir_notes/**
-/filtered_fhir_ib2401
+/input_data/**
