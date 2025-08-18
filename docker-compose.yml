@@ -56,7 +56,7 @@ services:
       # JVM memory settings for better performance
       - "JAVA_OPTS=-Xmx4g -Xms2g -XX:+UseG1GC -XX:MaxGCPauseMillis=200"
     volumes:
-      - ./fhir:/app/fhir
+      - ./input_data/fhir:/app/fhir
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/fhir/metadata"]
       interval: 30s
@@ -71,7 +71,7 @@ services:
       - 8000:8000
     restart: "unless-stopped"
     volumes:
-      - ./fhir:/app/fhir:ro
+      - ./input_data/fhir:/app/fhir:ro
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/"]
       interval: 30s

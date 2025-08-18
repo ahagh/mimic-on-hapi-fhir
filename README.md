@@ -31,7 +31,7 @@ You **must** complete the PhysioNet credentialing process and agree to the data 
 
 ### 3. Data Preparation
 1. Download NDJSON files from PhysioNet
-2. Place all `.ndjson.gz` files in the `./fhir` directory
+2. Place all `.ndjson.gz` files in the `./input_data/fhir` directory
 3. Keep original filenames and compression (faster loading)
 
 ---
@@ -43,9 +43,9 @@ You **must** complete the PhysioNet credentialing process and agree to the data 
 git clone https://github.com/your-username/mimic-iv-on-fhir-21.git
 cd mimic-iv-on-fhir-21
 
-# Create fhir directory and place your NDJSON files here
-mkdir -p fhir
-# Copy your downloaded MIMIC-IV FHIR files to ./fhir/
+# Create input_data/fhir directory and place your NDJSON files here
+mkdir -p input_data/fhir
+# Copy your downloaded MIMIC-IV FHIR files to ./input_data/fhir/
 ```
 
 ### 2. Start the Stack
@@ -125,7 +125,7 @@ with open("patient_ids_to_filter.txt", "w") as f:
 ```bash
 python filter_fhir_by_patients.py \
     --patient-list patient_ids_to_filter.txt \
-    --fhir-dir ./fhir \
+    --fhir-dir ./input_data/fhir \
     --output-dir ./filtered_fhir_cohort
 ```
 

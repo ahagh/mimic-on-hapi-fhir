@@ -27,7 +27,7 @@ class SimpleBatchFilter:
     """Simple batch filtering for multiple patients."""
 
     def __init__(
-        self, patient_ids: List[str], fhir_dir: str = "./fhir", max_workers: int = None
+        self, patient_ids: List[str], fhir_dir: str = "./input_data/fhir", max_workers: int = None
     ):
         self.patient_ids = set(patient_ids)
         self.fhir_dir = Path(fhir_dir)
@@ -221,8 +221,8 @@ def main():
 
     parser.add_argument(
         "--fhir-dir",
-        default="./fhir",
-        help="Directory containing FHIR NDJSON files (default: ./fhir)",
+        default="./input_data/fhir",
+        help="Directory containing FHIR NDJSON files (default: ./input_data/fhir)",
     )
     parser.add_argument(
         "--keep-temp",
