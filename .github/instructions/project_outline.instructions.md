@@ -17,7 +17,7 @@ Provide project context and coding guidelines that AI should follow when generat
    - Ensure that all code is properly commented and documented.
 
 3. **Project Structure**:
-   - All FHIR ndjson resources are stored in the `fhir/` directory.
+   - All FHIR ndjson resources are stored in the `input_data/fhir/` directory.
    - `bulk_import.py`: Script for importing NDJSON files into the FHIR server.
    - `fhir_file_server.py`: HTTP server for serving NDJSON files for bulk import.
    - The `scripts/` directory contains utility scripts for data processing and manipulation.
